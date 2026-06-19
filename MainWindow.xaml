@@ -1,0 +1,1029 @@
+<Window x:Class="ZebraPrintUtility.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ZebraPrintUtility"
+        xmlns:models="clr-namespace:ZebraPrintUtility.Models"
+        mc:Ignorable="d"
+        Title="Zebra ZPL &amp; XML Printer Utility" 
+        Height="780" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#111520"
+        Foreground="#FFFFFF">
+
+    <Window.Resources>
+        <!-- Modern Colors & Brushes -->
+        <SolidColorBrush x:Key="BgPrimary" Color="#111520" />
+        <SolidColorBrush x:Key="BgCard" Color="#1E2333" />
+        <SolidColorBrush x:Key="BgInput" Color="#151926" />
+        <SolidColorBrush x:Key="BgSidebar" Color="#181B26" />
+        
+        <SolidColorBrush x:Key="BorderBrush" Color="#2E374D" />
+        <SolidColorBrush x:Key="TextPrimary" Color="#FFFFFF" />
+        <SolidColorBrush x:Key="TextSecondary" Color="#8B949E" />
+        <SolidColorBrush x:Key="AccentCyan" Color="#00F2FE" />
+        <SolidColorBrush x:Key="AccentBlue" Color="#4FACFE" />
+        
+        <!-- Gradient Brush for Primary Buttons -->
+        <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#00F2FE" Offset="0.0" />
+            <GradientStop Color="#4FACFE" Offset="1.0" />
+        </LinearGradientBrush>
+        
+        <!-- Status Colors -->
+        <SolidColorBrush x:Key="StatusSuccess" Color="#10B981" />
+        <SolidColorBrush x:Key="StatusError" Color="#EF4444" />
+        <SolidColorBrush x:Key="StatusWarning" Color="#F59E0B" />
+
+        <!-- Converter for Connection Method Visibility -->
+        <local:MethodToVisibilityConverter x:Key="MethodToVis" />
+        <local:NullToVisibilityConverter x:Key="NullToVis" />
+        <local:BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- Modern Button Style -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#2E374D" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#3D4966"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#1A202E"/>
+                                <Setter Property="Foreground" Value="#4B5563"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Primary Gradient Button Style -->
+        <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="{StaticResource PrimaryGradient}" />
+            <Setter Property="Foreground" Value="#0D1117" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#00F2FE" Opacity="0.15" BlurRadius="8" ShadowDepth="1" />
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#33F5FF" Offset="0.0" />
+                                            <GradientStop Color="#70BFFF" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#1D2E3D"/>
+                                <Setter Property="Foreground" Value="#3B4B5A"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Print Action Button Style -->
+        <Style x:Key="PrintButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#10B981" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#059669"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern TextBox Style -->
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="{StaticResource BgInput}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="CaretBrush" Value="{StaticResource AccentCyan}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="4">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentCyan}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern ComboBox Style -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Background" Value="{StaticResource BgInput}" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- Modern DataGrid Style -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="RowBackground" Value="#1E2333" />
+            <Setter Property="AlternatingRowBackground" Value="#252A3C" />
+            <Setter Property="Foreground" Value="#FFFFFF" />
+            <Setter Property="BorderBrush" Value="#2E374D" />
+            <Setter Property="HorizontalGridLinesBrush" Value="#2E374D" />
+            <Setter Property="VerticalGridLinesBrush" Value="Transparent" />
+            <Setter Property="RowHeaderWidth" Value="0" />
+            <Setter Property="AutoGenerateColumns" Value="True" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="ColumnHeaderHeight" Value="34" />
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#151926" />
+            <Setter Property="Foreground" Value="#8B949E" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+            <Setter Property="BorderBrush" Value="#2E374D" />
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#00F2FE" />
+                    <Setter Property="Foreground" Value="#0D1117" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Navigation Sidebar -->
+            <ColumnDefinition Width="220" />
+            <!-- Main Config Area -->
+            <ColumnDefinition Width="*" />
+            <!-- Live Preview Area -->
+            <ColumnDefinition Width="400" />
+        </Grid.ColumnDefinitions>
+
+        <!-- COLUMN 1: SIDEBAR -->
+        <Border Grid.Column="0" Background="{StaticResource BgSidebar}" BorderThickness="0,0,1,0" BorderBrush="{StaticResource BorderBrush}">
+            <Grid Margin="15,25">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="20" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- App Brand / Header -->
+                <StackPanel Grid.Row="0">
+                    <TextBlock Text="SGAAC" Foreground="{StaticResource AccentCyan}" FontSize="24" FontWeight="Bold"/>
+                    <TextBlock Text="ZEBRA PRINTER UTILITY" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="SemiBold" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <!-- Sidebar Buttons -->
+                <StackPanel Grid.Row="2" Margin="0,10">
+                    <!-- Tab Button styles implemented via RadioButtons styled like menu options -->
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" 
+                                 GroupName="MenuTabs" IsChecked="True"
+                                 Command="{Binding SaveSettingsCommand}"
+                                 Click="Menu_Click" Tag="0"
+                                 Margin="0,4" Padding="12,12" HorizontalContentAlignment="Left"
+                                 Background="Transparent" BorderThickness="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="✏️" Margin="0,0,10,0"/>
+                            <TextBlock Text="Raw ZPL Printer" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" 
+                                 GroupName="MenuTabs"
+                                 Click="Menu_Click" Tag="1"
+                                 Margin="0,4" Padding="12,12" HorizontalContentAlignment="Left"
+                                 Background="Transparent" BorderThickness="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📄" Margin="0,0,10,0"/>
+                            <TextBlock Text="RPT XML Template" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" 
+                                 GroupName="MenuTabs"
+                                 Click="Menu_Click" Tag="2"
+                                 Margin="0,4" Padding="12,12" HorizontalContentAlignment="Left"
+                                 Background="Transparent" BorderThickness="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚙️" Margin="0,0,10,0"/>
+                            <TextBlock Text="Printer Setup" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" 
+                                 GroupName="MenuTabs"
+                                 Click="Menu_Click" Tag="3"
+                                 Margin="0,4" Padding="12,12" HorizontalContentAlignment="Left"
+                                 Background="Transparent" BorderThickness="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⏳" Margin="0,0,10,0"/>
+                            <TextBlock Text="History &amp; Logs" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </RadioButton>
+
+                    <RadioButton Style="{StaticResource {x:Type ToggleButton}}" 
+                                 GroupName="MenuTabs"
+                                 Click="Menu_Click" Tag="4"
+                                 Margin="0,4" Padding="12,12" HorizontalContentAlignment="Left"
+                                 Background="Transparent" BorderThickness="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔄" Margin="0,0,10,0"/>
+                            <TextBlock Text="SQL Auto-Print" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+
+                <!-- Connection Summary (Footer) -->
+                <Border Grid.Row="3" Background="{StaticResource BgInput}" CornerRadius="6" Padding="12" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}">
+                    <StackPanel>
+                        <TextBlock Text="Selected Target:" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding Settings.ConnectionMethod}" Foreground="{StaticResource AccentCyan}" FontWeight="Bold" Margin="0,4,0,2"/>
+                        
+                        <!-- Details depending on selected method -->
+                        <TextBlock Text="{Binding Settings.NetworkIpAddress}" FontSize="11" Foreground="{StaticResource TextPrimary}"
+                                   Visibility="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=Network}"/>
+                        <TextBlock Text="{Binding Settings.SpoolerPrinterName}" FontSize="11" Foreground="{StaticResource TextPrimary}" MaxWidth="170" TextTrimming="CharacterEllipsis"
+                                   Visibility="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=WindowsSpooler}"/>
+                        <TextBlock Text="{Binding Settings.SerialPortName}" FontSize="11" Foreground="{StaticResource TextPrimary}"
+                                   Visibility="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=Serial}"/>
+                        
+                        <Button Content="Test Link" Margin="0,10,0,0" Padding="6,6" FontSize="11" Command="{Binding TestConnectionCommand}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- COLUMN 2: WORKSPACE TABS -->
+        <TabControl Grid.Column="1" x:Name="MainTabs" SelectedIndex="{Binding SelectedTabIndex}" BorderThickness="0" Background="Transparent">
+            <!-- Hide tab headers since we navigate using the styled Sidebar RadioButtons -->
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                </Style>
+            </TabControl.ItemContainerStyle>
+
+            <!-- TAB 0: RAW ZPL PRINT -->
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                        <TextBlock Text="Raw ZPL Printing Console" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="Write, import, and print raw Zebra Programming Language (ZPL) scripts directly." Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                    </StackPanel>
+
+                    <!-- Code Editor -->
+                    <Border Grid.Row="1" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="5">
+                        <TextBox Text="{Binding ZplContent, UpdateSourceTrigger=PropertyChanged}" 
+                                 AcceptsReturn="True" AcceptsTab="True" 
+                                 FontFamily="Consolas" FontSize="13" 
+                                 Background="Transparent" BorderThickness="0" 
+                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    </Border>
+
+                    <!-- Footer Controls -->
+                    <Grid Grid.Row="2" Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Button Grid.Column="0" Content="📂 Load ZPL File" Command="{Binding LoadZplFileCommand}" Padding="15,10"/>
+                        
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Button Content="🗑️ Clear" Click="ClearZpl_Click" Margin="0,0,10,0" Background="#3B445B" Padding="15,10"/>
+                            <Button Content="🖨️ Print Label" Command="{Binding PrintCommand}" Style="{StaticResource PrintButton}" Padding="25,10" FontSize="14"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- TAB 1: XML TEMPLATE MAPPING -->
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                        <TextBlock Text="RPT XML Template Field Mapper" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="Load XML generated from a Crystal Report (RPT) and map field variables dynamically into a ZPL template." Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                    </StackPanel>
+
+                    <!-- File Loader Card -->
+                    <Border Grid.Row="1" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="15" Margin="0,0,0,15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Active XML File Source:" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding XmlFilePath, FallbackValue='No XML loaded. Select a file to parse data fields.'}" 
+                                           Foreground="{StaticResource AccentCyan}" FontWeight="SemiBold" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                            <Button Grid.Column="1" Content="📂 Load XML Export" Command="{Binding LoadXmlFileCommand}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Split Workspace: Data Grid vs Template Editor -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="4*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left Column: XML Records grid -->
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text="Extracted Records / Label Rows" FontSize="13" FontWeight="Bold" Margin="0,0,0,8" Foreground="{StaticResource TextSecondary}"/>
+                            
+                            <Border Grid.Row="1" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="1">
+                                <Grid>
+                                    <!-- Empty State Placeholder -->
+                                    <TextBlock Text="No XML records loaded. Click 'Load XML Export' above." 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                               Foreground="{StaticResource TextSecondary}" FontSize="12"
+                                               Visibility="{Binding XmlRecords.Count, Converter={StaticResource NullToVis}, ConverterParameter=Invert}"/>
+                                    
+                                    <!-- Records Data Grid -->
+                                    <DataGrid ItemsSource="{Binding XmlRecords}" SelectedItem="{Binding SelectedXmlRecord}" 
+                                              Visibility="{Binding XmlRecords.Count, Converter={StaticResource NullToVis}}"/>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <!-- Splitter -->
+                        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent" Width="5"/>
+
+                        <!-- Right Column: ZPL Template Editor -->
+                        <Grid Grid.Column="2" Margin="10,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Grid Grid.Row="0" Margin="0,0,0,8">
+                                <TextBlock Text="ZPL Template Design" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                <TextBlock Text="Use {FieldName} for variables" FontSize="11" Foreground="{StaticResource AccentCyan}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                            
+                            <Border Grid.Row="1" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="5">
+                                <TextBox Text="{Binding Settings.ZplTemplate, UpdateSourceTrigger=PropertyChanged}" 
+                                         AcceptsReturn="True" AcceptsTab="True" 
+                                         FontFamily="Consolas" FontSize="13" 
+                                         Background="Transparent" BorderThickness="0" 
+                                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                            </Border>
+
+                            <Border Grid.Row="2" Background="{StaticResource BgInput}" BorderThickness="1,0,1,1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="0,0,6,6" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="Available Merge Placeholders in this XML:" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="Bold"/>
+                                    <ItemsControl ItemsSource="{Binding SelectedXmlRecord.Keys}" Margin="0,5,0,0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#2E374D" CornerRadius="4" Padding="5,2" Margin="0,0,5,5">
+                                                    <TextBlock Text="{Binding StringFormat='\{{0}\}'}" FontSize="10" FontFamily="Consolas" Foreground="{StaticResource AccentCyan}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+
+                    <!-- Footer Controls -->
+                    <Grid Grid.Row="3" Margin="0,15,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Batch status -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="Active Record Index: " Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                            <TextBlock Text="{Binding SelectedXmlRecord.Values[0], FallbackValue='None Selected'}" Foreground="{StaticResource AccentCyan}" FontWeight="Bold" FontSize="12"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <!-- Batch print if multiple rows exist -->
+                            <Button Content="🖨️ Print Batch (All Rows)" Command="{Binding PrintAllXmlRecordsCommand}" 
+                                    Visibility="{Binding HasMultipleXmlRecords, Converter={StaticResource BoolToVis}}"
+                                    Margin="0,0,10,0" Background="#4F46E5" Padding="15,10"/>
+                            
+                            <Button Content="🖨️ Print Selected Label" Command="{Binding PrintSelectedXmlRecordCommand}" 
+                                    Style="{StaticResource PrintButton}" Padding="25,10" FontSize="14"/>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- TAB 2: PRINTER CONFIGURATION -->
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                        <TextBlock Text="Printer Connection &amp; Interface Setup" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="Choose how the application communicates with the physical Zebra hardware printer." Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                    </StackPanel>
+
+                    <!-- Configuration Form -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="0,0,10,0">
+                            <!-- Connection Selector -->
+                            <Border Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="20" Margin="0,0,0,20">
+                                <StackPanel>
+                                    <TextBlock Text="1. Connection Interface Method" FontSize="15" FontWeight="Bold" Margin="0,0,0,10" Foreground="{StaticResource AccentCyan}"/>
+                                    <TextBlock Text="Select the physical link type matching your printer hardware configuration." Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,0,0,15"/>
+                                    
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Network Mode -->
+                                        <RadioButton Content="Network (TCP/IP)" GroupName="ConnMode" 
+                                                     IsChecked="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=Network, Mode=TwoWay}"
+                                                     Foreground="#FFFFFF" Margin="0,0,30,0" FontSize="13" FontWeight="SemiBold"/>
+                                        <!-- USB Spooler Mode -->
+                                        <RadioButton Content="Windows Driver Spooler (USB)" GroupName="ConnMode" 
+                                                     IsChecked="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=WindowsSpooler, Mode=TwoWay}"
+                                                     Foreground="#FFFFFF" Margin="0,0,30,0" FontSize="13" FontWeight="SemiBold"/>
+                                        <!-- Serial COM Mode -->
+                                        <RadioButton Content="Serial Port (RS-232)" GroupName="ConnMode" 
+                                                     IsChecked="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=Serial, Mode=TwoWay}"
+                                                     Foreground="#FFFFFF" FontSize="13" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- NETWORK SETTINGS -->
+                            <Border Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="20" Margin="0,0,0,20"
+                                    Visibility="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=Network}">
+                                <StackPanel>
+                                    <TextBlock Text="2. TCP/IP Network Connection Details" FontSize="15" FontWeight="Bold" Margin="0,0,0,15" Foreground="{StaticResource AccentCyan}"/>
+                                    
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="IP Address:" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                            <TextBox Text="{Binding Settings.NetworkIpAddress, UpdateSourceTrigger=PropertyChanged}" FontSize="14"/>
+                                            <TextBlock Text="e.g. 192.168.1.100" Foreground="{StaticResource TextSecondary}" FontSize="10" Margin="0,4,0,0"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Port Number:" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                            <TextBox Text="{Binding Settings.NetworkPort, UpdateSourceTrigger=PropertyChanged}" FontSize="14"/>
+                                            <TextBlock Text="Standard Zebra: 9100" Foreground="{StaticResource TextSecondary}" FontSize="10" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- WINDOWS SPOOLER (USB) SETTINGS -->
+                            <Border Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="20" Margin="0,0,0,20"
+                                    Visibility="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=WindowsSpooler}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,15">
+                                        <TextBlock Text="2. Local Spooler / Driver Connection Details" FontSize="15" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" VerticalAlignment="Center"/>
+                                        <Button Content="🔄 Scan Printers" Command="{Binding RefreshPrintersCommand}" HorizontalAlignment="Right" Padding="10,5" FontSize="11"/>
+                                    </Grid>
+
+                                    <TextBlock Text="Printer Driver Name:" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="15"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- Combo selection of installed printers -->
+                                        <ComboBox Grid.Column="0" ItemsSource="{Binding AvailablePrinters}" SelectedItem="{Binding Settings.SpoolerPrinterName}" FontSize="14" IsEditable="True"/>
+                                        <TextBlock Grid.Column="2" Text="Verify the exact Windows queue printer name (e.g. 'Zebra ZD88D' or generic driver name)." Foreground="{StaticResource TextSecondary}" FontSize="11" Width="200" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SERIAL SETTINGS -->
+                            <Border Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="20" Margin="0,0,0,20"
+                                    Visibility="{Binding Settings.ConnectionMethod, Converter={StaticResource MethodToVis}, ConverterParameter=Serial}">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,15">
+                                        <TextBlock Text="2. Serial Interface Parameters" FontSize="15" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" VerticalAlignment="Center"/>
+                                        <Button Content="🔄 Refresh COM" Command="{Binding RefreshPrintersCommand}" HorizontalAlignment="Right" Padding="10,5" FontSize="11"/>
+                                    </Grid>
+
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="20"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="COM Port Name:" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                            <ComboBox ItemsSource="{Binding AvailableSerialPorts}" SelectedItem="{Binding Settings.SerialPortName}" FontSize="14" IsEditable="True"/>
+                                            <TextBlock Text="e.g. COM1 or COM4" Foreground="{StaticResource TextSecondary}" FontSize="10" Margin="0,4,0,0"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Baud Rate (bps):" Foreground="{StaticResource TextSecondary}" FontSize="12" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                            <ComboBox ItemsSource="{Binding AvailableBaudRates}" SelectedItem="{Binding Settings.SerialBaudRate}" FontSize="14"/>
+                                            <TextBlock Text="Standard Zebra default: 9600" Foreground="{StaticResource TextSecondary}" FontSize="10" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- ACTIONS -->
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button Content="💾 Save Settings" Command="{Binding SaveSettingsCommand}" Style="{StaticResource PrimaryButton}" Width="150" Height="40" Margin="0,0,15,0"/>
+                                <Button Content="🔌 Test Connection Link" Command="{Binding TestConnectionCommand}" Width="200" Height="40"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <!-- TAB 3: HISTORY & LOGS -->
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,15">
+                        <StackPanel>
+                            <TextBlock Text="Print Execution Logs &amp; Archive" FontSize="20" FontWeight="Bold"/>
+                            <TextBlock Text="Review system communication records, status changes, and history of past printed label layouts." Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                        </StackPanel>
+                        <Button Content="🗑️ Clear Logs" Command="{Binding ClearHistoryCommand}" HorizontalAlignment="Right" Padding="12,6" FontSize="11" VerticalAlignment="Center"/>
+                    </Grid>
+
+                    <!-- History Split Layout -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left: Print History Grid -->
+                        <Grid Grid.Column="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Job Dispatch History" FontSize="13" FontWeight="Bold" Margin="0,0,0,8" Foreground="{StaticResource TextSecondary}"/>
+                            
+                            <Border Grid.Row="1" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="1">
+                                <Grid>
+                                    <TextBlock Text="No labels printed yet." 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                               Foreground="{StaticResource TextSecondary}" FontSize="12"
+                                               Visibility="{Binding PrintHistory.Count, Converter={StaticResource NullToVis}, ConverterParameter=Invert}"/>
+                                    
+                                    <DataGrid ItemsSource="{Binding PrintHistory}" 
+                                              Visibility="{Binding PrintHistory.Count, Converter={StaticResource NullToVis}}"
+                                              HeadersVisibility="Column" SelectionMode="Single">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat=\{0:HH:mm:ss\}}" Width="70"/>
+                                            <DataGridTextColumn Header="Label / Job Name" Binding="{Binding LabelName}" Width="*"/>
+                                            <DataGridTextColumn Header="Interface Port" Binding="{Binding PrinterUsed}" Width="130"/>
+                                            <DataGridTemplateColumn Header="Status" Width="80">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <Border CornerRadius="4" Padding="4,2" HorizontalAlignment="Center" Width="65">
+                                                            <Border.Style>
+                                                                <Style TargetType="Border">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Success">
+                                                                            <Setter Property="Background" Value="#065F46"/>
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                                                            <Setter Property="Background" Value="#991B1B"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </Border.Style>
+                                                            <TextBlock Text="{Binding Status}" Foreground="#FFFFFF" FontWeight="Bold" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent" Width="5"/>
+
+                        <!-- Right: Real-time System Debug Logs -->
+                        <Grid Grid.Column="2" Margin="10,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text="Live System Console Debug" FontSize="13" FontWeight="Bold" Margin="0,0,0,8" Foreground="{StaticResource TextSecondary}"/>
+                            
+                            <Border Grid.Row="1" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="8">
+                                <TextBox Text="{Binding ConsoleLogs, Mode=OneWay}" 
+                                         IsReadOnly="True" 
+                                         FontFamily="Consolas" FontSize="11.5"
+                                         Foreground="#BFC7D5" Background="Transparent" 
+                                         BorderThickness="0"
+                                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+
+            <!-- TAB 4: DATABASE SQL AUTO-PRINT LOOP -->
+            <TabItem>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Title Header -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,15">
+                        <TextBlock Text="SQL Database Auto-Printer" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="Configure a background polling loop to query component serials from SQL Server and print them to the Zebra printer." Foreground="{StaticResource TextSecondary}" FontSize="12"/>
+                    </StackPanel>
+
+                    <!-- Loop Controls Card -->
+                    <Border Grid.Row="1" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="15" Margin="0,0,0,15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Loop Engine Status:" Foreground="{StaticResource TextSecondary}" FontSize="10" FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                    <!-- Visual status indicator dot -->
+                                    <Ellipse Width="10" Height="10" Margin="0,0,8,0" VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDbLoopRunning}" Value="True">
+                                                        <Setter Property="Fill" Value="{StaticResource StatusSuccess}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsDbLoopRunning}" Value="False">
+                                                        <Setter Property="Fill" Value="{StaticResource StatusError}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding DbLoopStatus}" Foreground="{StaticResource TextPrimary}" FontWeight="Bold" FontSize="14"/>
+                                </StackPanel>
+                            </StackPanel>
+                            
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="🔌 Test DB Link" Command="{Binding TestDbConnectionCommand}" Margin="0,0,10,0" Padding="15,8"/>
+                                <Button Command="{Binding ToggleDbLoopCommand}" Padding="20,8" FontSize="13">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsDbLoopRunning}" Value="True">
+                                                    <Setter Property="Content" Value="🛑 Stop Loop"/>
+                                                    <Setter Property="Background" Value="#EF4444"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsDbLoopRunning}" Value="False">
+                                                    <Setter Property="Content" Value="▶️ Start Loop"/>
+                                                    <Setter Property="Background" Value="#10B981"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Split workspace: Config & Template vs Logs -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4.5*" />
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="5.5*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left Column: Config and ZPL Template -->
+                        <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,10,0">
+                            <StackPanel>
+                                <!-- Connection details -->
+                                <TextBlock Text="SQL Configuration Parameters" FontSize="13" FontWeight="Bold" Margin="0,0,0,8" Foreground="{StaticResource TextSecondary}"/>
+                                <Border Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="15" Margin="0,0,0,15">
+                                    <StackPanel>
+                                        <!-- Connection String -->
+                                        <TextBlock Text="Connection String:" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding Settings.DbConnectionString, UpdateSourceTrigger=PropertyChanged}" FontSize="12" Margin="0,0,0,12"/>
+
+                                        <!-- Select Query -->
+                                        <TextBlock Text="SQL Select Query (To fetch pending serials):" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding Settings.DbSelectQuery, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" Height="50" FontSize="11.5" FontFamily="Consolas" Margin="0,0,0,12" VerticalScrollBarVisibility="Auto"/>
+
+                                        <!-- Update Query -->
+                                        <TextBlock Text="SQL Update Query (Runs for each printed serial - Optional):" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                        <TextBox Text="{Binding Settings.DbUpdateQuery, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" Height="50" FontSize="11.5" FontFamily="Consolas" Margin="0,0,0,12" VerticalScrollBarVisibility="Auto"/>
+
+                                        <!-- Interval -->
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="15"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="Polling Interval (seconds):" Foreground="{StaticResource TextSecondary}" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                                <TextBox Text="{Binding Settings.DbLoopIntervalSeconds, UpdateSourceTrigger=PropertyChanged}" FontSize="12"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="2" Text="Wait time between queries." Foreground="{StaticResource TextSecondary}" FontSize="11" Width="130" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,15,0,0"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Barcode ZPL Template -->
+                                <Grid Margin="0,5,0,8">
+                                    <TextBlock Text="Barcode ZPL Template Design" FontSize="13" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Use {SERIAL} for barcode value" FontSize="11" Foreground="{StaticResource AccentCyan}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                                <Border Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="5" Height="180">
+                                    <TextBox Text="{Binding DbZplTemplate, UpdateSourceTrigger=PropertyChanged}" 
+                                             AcceptsReturn="True" AcceptsTab="True" 
+                                             FontFamily="Consolas" FontSize="12.5" 
+                                             Background="Transparent" BorderThickness="0" 
+                                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+
+                        <!-- Splitter -->
+                        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="Transparent" Width="5"/>
+
+                        <!-- Right Column: Loop execution logs -->
+                        <Grid Grid.Column="2" Margin="10,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="Real-time SQL Polling History" FontSize="13" FontWeight="Bold" Margin="0,0,0,8" Foreground="{StaticResource TextSecondary}"/>
+
+                            <Border Grid.Row="1" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="1">
+                                <Grid>
+                                    <!-- Empty logs text -->
+                                    <TextBlock Text="Loop is idle. Start the loop to see logs." 
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                               Foreground="{StaticResource TextSecondary}" FontSize="12"
+                                               Visibility="{Binding DbSerialLogs.Count, Converter={StaticResource NullToVis}, ConverterParameter=Invert}"/>
+
+                                    <!-- Logs Data Grid -->
+                                    <DataGrid ItemsSource="{Binding DbSerialLogs}" AutoGenerateColumns="False"
+                                              Visibility="{Binding DbSerialLogs.Count, Converter={StaticResource NullToVis}}"
+                                              HeadersVisibility="Column" SelectionMode="Single">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Time" Binding="{Binding Timestamp, StringFormat=\{0:HH:mm:ss\}}" Width="70"/>
+                                            <DataGridTextColumn Header="Serial" Binding="{Binding Serial}" Width="120"/>
+                                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                                            <DataGridTextColumn Header="Details / Errors" Binding="{Binding Details}" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- COLUMN 3: PERSISTENT PREVIEW PANE -->
+        <Border Grid.Column="2" Background="{StaticResource BgSidebar}" BorderThickness="1,0,0,0" BorderBrush="{StaticResource BorderBrush}">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Header Details -->
+                <Grid Grid.Row="0" Margin="0,5,0,15">
+                    <StackPanel>
+                        <TextBlock Text="Realtime Print Visualizer" FontSize="16" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                        <TextBlock Text="Preview generated by Labelary Web Rendering API" FontSize="10.5" Foreground="{StaticResource TextSecondary}"/>
+                    </StackPanel>
+                    <Border Height="18" Background="#252F47" CornerRadius="9" Padding="8,1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="{Binding PreviewStatus}" FontSize="9.5" Foreground="{StaticResource TextPrimary}" FontWeight="Bold" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+
+                <!-- Preview Area / Simulated Label -->
+                <Border Grid.Row="1" Background="#0C0E14" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+                    <Grid>
+                        <!-- Grid pattern background representing printer media -->
+                        <Grid.Background>
+                            <DrawingBrush TileMode="Tile" Viewport="0,0,10,10" ViewportUnits="Absolute">
+                                <DrawingBrush.Drawing>
+                                    <GeometryDrawing Geometry="M0,0 L10,0 L10,10 M0,0 M10,0">
+                                        <GeometryDrawing.Pen>
+                                            <Pen Brush="#151926" Thickness="0.8" />
+                                        </GeometryDrawing.Pen>
+                                    </GeometryDrawing>
+                                </DrawingBrush.Drawing>
+                            </DrawingBrush>
+                        </Grid.Background>
+
+                        <!-- Label Image Container -->
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                            <Grid MinWidth="250" MinHeight="350">
+                                <!-- Shadow box around label -->
+                                <Border Background="#FFFFFF" CornerRadius="2" Margin="10" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#000000" Opacity="0.4" BlurRadius="15" ShadowDepth="4" />
+                                    </Border.Effect>
+                                    
+                                    <Image Source="{Binding PreviewImage}" Stretch="Uniform" Margin="4"/>
+                                </Border>
+                                
+                                <!-- Loading / Error overlays -->
+                                <Grid Background="#E60D1117" Visibility="{Binding PreviewStatus, Converter={StaticResource MethodToVis}, ConverterParameter=Refreshing Preview...}">
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="⏳" FontSize="40" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Rendering Label..." FontWeight="Bold" Foreground="#FFFFFF" Margin="0,10,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Background="#E60D1117" Visibility="{Binding PreviewImage, Converter={StaticResource NullToVis}, ConverterParameter=Invert}">
+                                    <!-- Hide when rendering -->
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding PreviewStatus}" Value="Refreshing Preview...">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                                        <TextBlock Text="🖨️" FontSize="44" HorizontalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
+                                        <TextBlock Text="Label Preview Area" FontWeight="Bold" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,5" Foreground="{StaticResource TextPrimary}"/>
+                                        <TextBlock Text="A rendering of the current ZPL command string will display here automatically." TextAlignment="Center" Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Grid>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Label Sizing Controls -->
+                <Border Grid.Row="2" Background="{StaticResource BgCard}" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}" CornerRadius="6" Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Width Selector -->
+                        <StackPanel Grid.Row="0" Grid.Column="0">
+                            <TextBlock Text="Label Width (inches):" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,0,0,4"/>
+                            <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding LabelWidth}">
+                                <ComboBoxItem Content="2.0 in" Tag="2.0"/>
+                                <ComboBoxItem Content="3.0 in" Tag="3.0"/>
+                                <ComboBoxItem Content="4.0 in" Tag="4.0" IsSelected="True"/>
+                                <ComboBoxItem Content="6.0 in" Tag="6.0"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Height Selector -->
+                        <StackPanel Grid.Row="0" Grid.Column="2">
+                            <TextBlock Text="Label Height (inches):" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,0,0,4"/>
+                            <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding LabelHeight}">
+                                <ComboBoxItem Content="2.0 in" Tag="2.0"/>
+                                <ComboBoxItem Content="3.0 in" Tag="3.0"/>
+                                <ComboBoxItem Content="4.0 in" Tag="4.0"/>
+                                <ComboBoxItem Content="6.0 in" Tag="6.0" IsSelected="True"/>
+                                <ComboBoxItem Content="8.0 in" Tag="8.0"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <!-- Resolution (DPMM) Selector -->
+                        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3">
+                            <TextBlock Text="Printer Resolution:" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="0,0,0,4"/>
+                            <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding LabelDpmm}">
+                                <ComboBoxItem Content="203 DPI (8 dpmm) - Standard Desktop" Tag="8" IsSelected="True"/>
+                                <ComboBoxItem Content="300 DPI (12 dpmm) - High Resolution" Tag="12"/>
+                                <ComboBoxItem Content="600 DPI (24 dpmm) - Ultra Fine" Tag="24"/>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
+

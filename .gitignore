@@ -1,0 +1,66 @@
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code
+.vscode/
+.vs/
+.vs/ProjectEvaluation/
+.vs/upmSystemAPI/
+
+# Rider
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg
+packages/
+*.snupkg
+# Project lock files
+project.lock.json
+project.assets.json
+
+# Logs
+*.log
+
+# ASP.NET Core secrets
+**/secrets.json
+
+# Configuration files
+appsettings.Development.json
+appsettings.Local.json
+
+# EF Core Migrations snapshots (optional)
+*Migrations/*.Designer.cs
+*Migrations/*Snapshot.cs
+
+# Publish results
+publish/
+wwwroot/
+
+# Dotnet-specific
+*.dbmdl
+*.bak
+*.sql
+
+# Auto-generated files
+Generated_Code/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Test results
+TestResults/
+
+.fake
