@@ -1,0 +1,14 @@
+{
+  "ConnectionMethod": "Network",
+  "NetworkIpAddress": "192.168.1.100",
+  "NetworkPort": 9100,
+  "SpoolerPrinterName": "Zebra ZDesigner",
+  "SerialPortName": "COM1",
+  "SerialBaudRate": 9600,
+  "ZplTemplate": "^XA\r\n^CF0,30\r\n^FO50,50^FDItem Code: {ItemCode}^FS\r\n^FO50,100^FDDescription: {Description}^FS\r\n^FO50,150^FDSerial: {Serial}^FS\r\n^FO50,200^BCN,100,Y,N,N^FD{Serial}^FS\r\n^XZ",
+  "DbConnectionString": "Server=UPMAP04\\UPMDATA;Database=UPMWEB;User Id=upmUser;Password=Flg6petoa3z3UEyyglDA;TrustServerCertificate=True;",
+  "DbSelectQuery": "SELECT [Serial] FROM [UPMWEB].[upm_productionControl].[Control200] WHERE [PrintedLabel] IS NULL ORDER BY [CreateDate] ",
+  "DbUpdateQuery": "UPDATE [UPMWEB].[upm_productionControl].[Control200] SET [PrintedLabel] = GETDATE() WHERE Id = (SELECT TOP 1 Id FROM [UPMWEB].[upm_productionControl].[Control200] WHERE Serial = @Serial ORDER BY CreateDate DESC)",
+  "DbLoopIntervalSeconds": 10,
+  "DbZplTemplate": "^XA\r\n~TA000\r\n~JSN\r\n^LT0\r\n^MNW\r\n^MTT\r\n^PON\r\n^PMN\r\n^LH0,0\r\n^JMA\r\n^PR3,3\r\n~SD30\r\n^JUS\r\n^LRN\r\n^CI27\r\n^PA0,1,1,0\r\n^XZ\r\n^XA\r\n^MMT\r\n^PW160\r\n^LL208\r\n^LS0\r\n^BY3,3,96^FT114,189^BCB,,Y,N\r\n^FH\\^FD>;{SERIAL}^FS\r\n^PQ1,0,1,Y\r\n^XZ\r\n"
+}

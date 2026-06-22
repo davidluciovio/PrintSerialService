@@ -1,7 +1,11 @@
 using System;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ZebraPrintUtility.Models
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum PrinterConnectionMethod
     {
         Network,
@@ -11,6 +15,18 @@ namespace ZebraPrintUtility.Models
 
     public class PrinterSettings
     {
+        // Public parameterless constructor for normal instantiations
+        public PrinterSettings()
+        {
+            LoadFromFile("printer_settings.json");
+        }
+
+        // Private constructor for JsonSerializer to prevent recursion
+        [JsonConstructor]
+        private PrinterSettings(bool deserializing)
+        {
+        }
+
         public PrinterConnectionMethod ConnectionMethod { get; set; } = PrinterConnectionMethod.Network;
         
         // Network printer settings
@@ -67,5 +83,49 @@ namespace ZebraPrintUtility.Models
 ^PQ1,0,1,Y
 ^XZ
 ";
+
+        public void LoadFromFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+                var loaded = JsonSerializer.Deserialize<PrinterSettings>(json, options);
+                if (loaded != null)
+                {
+                    CopyFrom(loaded);
+                }
+            }
+            catch
+            {
+                // Fallback to property initializers (already set on outer object)
+            }
+        }
+
+        public void CopyFrom(PrinterSettings source)
+        {
+            if (source == null) return;
+
+            ConnectionMethod = source.ConnectionMethod;
+            NetworkIpAddress = source.NetworkIpAddress;
+            NetworkPort = source.NetworkPort;
+            SpoolerPrinterName = source.SpoolerPrinterName;
+            SerialPortName = source.SerialPortName;
+            SerialBaudRate = source.SerialBaudRate;
+            ZplTemplate = source.ZplTemplate;
+            DbConnectionString = source.DbConnectionString;
+            DbSelectQuery = source.DbSelectQuery;
+            DbUpdateQuery = source.DbUpdateQuery;
+            DbLoopIntervalSeconds = source.DbLoopIntervalSeconds;
+            DbZplTemplate = source.DbZplTemplate;
+        }
     }
 }
