@@ -2,7 +2,7 @@
   "ConnectionMethod": "Network",
   "NetworkIpAddress": "192.168.1.100",
   "NetworkPort": 9100,
-  "SpoolerPrinterName": "Zebra ZDesigner",
+  "SpoolerPrinterName": "ZDesigner ZT230-200dpi ZPL",
   "SerialPortName": "COM1",
   "SerialBaudRate": 9600,
   "ZplTemplate": "^XA\r\n^CF0,30\r\n^FO50,50^FDItem Code: {ItemCode}^FS\r\n^FO50,100^FDDescription: {Description}^FS\r\n^FO50,150^FDSerial: {Serial}^FS\r\n^FO50,200^BCN,100,Y,N,N^FD{Serial}^FS\r\n^XZ",
